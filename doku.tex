@@ -1,0 +1,119 @@
+\documentclass{article}
+\usepackage[ngerman]{babel}
+\usepackage[autostyle=true,german=quotes]{csquotes}
+\usepackage{siunitx}
+\usepackage[european, siunitx]{circuitikz}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% set the default code style
+\lstset{
+    frame=tb, % draw a frame at the top and bottom of the code block
+    tabsize=4, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    numbers=left, % display line numbers on the left
+    commentstyle=\color{green}, % comment color
+    keywordstyle=\color{blue}, % keyword color
+    stringstyle=\color{red} % string color
+}
+
+\title{Konstruktion eines Bluetooth-Thermometers}
+\author{Jonas Otto}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\newpage
+
+\tableofcontents
+\newpage
+
+\section{Elektronik}
+
+Verwendet wird der Temperatursensor \enquote{PT100}, der bei einer Temperatur
+von \SI{0}{\degreeCelsius} einen Widerstand von \SI{100}{\ohm} besitzt. Dieser
+Widerstand wird mit Hilfe eines Spannungsteilers gemessen, die Spannung
+$V_{adc}$wird mit einem Differenzverstärker verstärkt und von einem in den
+Arduino UNO integrierten Analog-Digital-Converter gemessen.
+
+\subsection{Schaltplan}
+\begin{center}
+  \begin{circuitikz}
+    \ctikzset{label/align = rotate}
+    \draw
+    (0,0) node[op amp] (opv1) {}
+    %Non-Inverting input
+    (-2, -.5) to (-2, 1) to[R=100<\ohm>] (-2,3) node[vcc] {5V} %Pullup
+    (-2, -2.5) node[ground] {} to[thR=PT100, -*] (-2, -.5)    %PT100
+    (opv1.+) to (-2, -.5)
+    %Inverting input
+    (-3,-2.5) node[ground] {} to[R=1<\kohm>] (-3, -.5) to[short, -*] (-3, .5) to (opv1.-)
+    (-3, .5) to (-3, 1) to[R=1<\kohm>] (-3,3) node[vcc] {5V}
+    %Output
+    (opv1.out) node[right] {$V_{adc}$}
+    %Power
+    (opv1.up) --++(0,0.5) node[vcc]{\SI{5}{\volt}}
+    (opv1.down) --++(0,-0.5) node[ground]{}
+    ;
+  \end{circuitikz}
+\end{center}
+
+
+\section{Software}
+
+Die Software besteht aus zwei Teilen: Auf dem Microcontroller wird die
+Temperatur berechnet und per Bluetooth an verbundene Geräte geschickt. Eine
+Android App zeigt die aktuelle Temperatur an und erlaubt die Konfiguration des
+Thermometers.
+
+\subsection{Microcontroller}
+
+  \begin{lstlisting}[language=C++, caption={Arduino code}]
+  #include <SoftwareSerial.h>
+
+  #define bluetoothRxPin 10
+  #define bluetoothTxPin 11
+  #define tmpPin A0
+
+  #define cFactor -16.0 //Temperature at 0V
+  #define mFactor 0.36 //Volts per degree C
+
+  SoftwareSerial bluetoothSerial(bluetoothRxPin, bluetoothTxPin);
+
+  void setup() {
+    bluetoothSerial.begin(9600);
+    Serial.begin(9600);
+  }
+
+  void loop() {
+    double tmpVoltage = analogRead(tmpPin) * (5.0/1023);
+    double temperatureCelsius = tmpVoltage * (1.0/mFactor) - cFactor;
+
+    Serial.print("Temperature: ");
+    Serial.print(temperatureCelsius);
+    Serial.println("C");
+
+    bluetoothSerial.println(temperatureCelsius);
+
+    delay(500);
+  }
+  \end{lstlisting}
+
+  \subsubsection{Temperaturberechnung}
+    Der Arduino UNO Microcontroller wird in einem angepassten C++ Dialekt
+    programmiert. Die Hauptfunktion des Programmes ist die Umrechnung der gemessenen
+    Spannung in eine Temperatur:
+    \[
+    \Theta = V_{t} * {1 \over m} - c
+    \]
+    $c$ ist dabei die Temperatur bei \SI{0}{\volt}, $m$ die mittlere Steigung der
+    Temperatur in $V \over \si{\degreeCelsius}$.
+
+  \subsubsection{Bluetooth Kommunikation}
+    Fuer die Bluetooth Kommunikation wird ein HC-05 Modul verwendet. Nach initialer
+    Konfiguration können Daten mittels serieller Schnittstelle an das Smartphone
+    übertragen werden. Die Temperatur wird ein Mal pro Sekunde als signed integer
+    übertragen, gefolgt von einem newline Zeichen.
+
+\end{document}
