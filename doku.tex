@@ -5,6 +5,10 @@
 \usepackage[european, siunitx]{circuitikz}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{url}
+\usepackage{IEEEtrantools}
+\usepackage[utf8]{inputenc}
+
 
 % set the default code style
 \lstset{
@@ -22,6 +26,8 @@
 \date{\today}
 
 \begin{document}
+
+\bstctlcite{BSTcontrol} %Using IEEEtranBSTCTL in bib for translating
 
 \maketitle
 \newpage
@@ -58,6 +64,27 @@ Arduino UNO integrierten Analog-Digital-Converter gemessen.
     ;
   \end{circuitikz}
 \end{center}
+
+\subsection{Layout}
+
+Die Platine soll als Arduino-Shield hergestellt werden, also direkt auf das Arduino
+UNO Entwicklungsboard aufsteckbar sein. Dafür wurde in der Software \enquote{Target 3001!}
+eine Vorlage\cite{arduinoTarget} benutzt. Für eine einfache Herstellung wurde
+eine einseitige Platine gewählt, welche zwar für Einschränkungen im Layout
+sorgt, dafür aber einfach herzustellen ist. Die Bauteile befinden sich später
+oben, die Leiterbahnen auf der Unterseite. Es werden ausschließlich
+Through-Hole Komponenten verwendet, für den Operationsverstärker war ein DIL
+Package verfügbar, welches gesockelt verbaut wird. Die Schwierigkeit lag bei
+diesem Schritt darin, das Layout sowohl einfach und kompakt zu halten, als auch
+einen einfachen Aufbau zu gewährleisten.
+
+\subsection{Bluetooth}
+
+Für die Bluetooth Kommunikation wird ein \enquote{HC-05} Modul eingesetzt,
+welches bereits mit Elektronik zur Spannungsversorgung mit \SI{5}{\volt}
+erhältlich ist. Da die serielle Schnittstelle des HC-05 auf einem Spannungslevel
+von \SI{3.3}{\volt} arbeitet, der Arduino UNO aber auf \SI{5}{\volt}, wurde
+ein Modul gewählt, welches auch Elektronik zum Level-Shifting enthält.
 
 
 \section{Software}
@@ -115,5 +142,8 @@ Thermometers.
     Konfiguration können Daten mittels serieller Schnittstelle an das Smartphone
     übertragen werden. Die Temperatur wird ein Mal pro Sekunde als signed integer
     übertragen, gefolgt von einem newline Zeichen.
+
+    \bibliographystyle{IEEEtran}
+    \bibliography{doku}
 
 \end{document}
