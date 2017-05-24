@@ -10,6 +10,7 @@
 \usepackage[utf8]{inputenc}
 
 
+
 % set the default code style
 \lstset{
     frame=tb, % draw a frame at the top and bottom of the code block
@@ -27,6 +28,7 @@
 
 \begin{document}
 
+\renewcommand\refname{Referenzen}
 \bstctlcite{BSTcontrol} %Using IEEEtranBSTCTL in bib for translating
 
 \maketitle
@@ -35,13 +37,22 @@
 \tableofcontents
 \newpage
 
+\section{Einleitung}
+
+Im Rahmen dieses Projektes soll eine elektronisches Thermometer entwickelt
+werden. Dieses soll die Temperatur messen und auf einem PC ausgeben. Alternativ
+kann die Temperatur auch per Bluetooth an ein Smartphone geschickt und dort
+ausgegeben werden.
+
 \section{Elektronik}
 
 Verwendet wird der Temperatursensor \enquote{PT100}, der bei einer Temperatur
 von \SI{0}{\degreeCelsius} einen Widerstand von \SI{100}{\ohm} besitzt. Dieser
-Widerstand wird mit Hilfe eines Spannungsteilers gemessen, die Spannung
-$V_{adc}$wird mit einem Differenzverstärker verstärkt und von einem in den
-Arduino UNO integrierten Analog-Digital-Converter gemessen.
+Widerstand wird mit Hilfe eines Spannungsteilers gemessen, die resultierende
+Spannung $V_{st}$ wird mit einem Differenzverstärker auf Werte zwischen
+\SI{0}{\volt} und \SI{5}{\volt} verstärkt. Diese Spannung $V_{adc}$ wird von
+einem Analog-Digital-Converter, der in dem Atmega328P Microcontroller auf dem
+Arduino UNO Board integriert ist, gemessen.
 
 \subsection{Schaltplan}
 \begin{center}
@@ -135,15 +146,22 @@ Thermometers.
     \Theta = V_{t} * {1 \over m} - c
     \]
     $c$ ist dabei die Temperatur bei \SI{0}{\volt}, $m$ die mittlere Steigung der
-    Temperatur in $V \over \si{\degreeCelsius}$.
+    Spannung in Abhängigkeit zur Temperatur in $V \over \si{\degreeCelsius}$.
 
   \subsubsection{Bluetooth Kommunikation}
-    Fuer die Bluetooth Kommunikation wird ein HC-05 Modul verwendet. Nach initialer
-    Konfiguration können Daten mittels serieller Schnittstelle an das Smartphone
-    übertragen werden. Die Temperatur wird ein Mal pro Sekunde als signed integer
-    übertragen, gefolgt von einem newline Zeichen.
+    Für die Bluetooth Kommunikation wird ein HC-05 Modul verwendet. Nach
+    initialer Konfiguration können Daten mittels serieller Schnittstelle an das
+    Smartphone übertragen werden. Die Temperatur wird ein Mal pro Sekunde als
+    signed integer übertragen, gefolgt von einem newline Zeichen.
 
-    \bibliographystyle{IEEEtran}
-    \bibliography{doku}
+  \subsection{Smartphone}
+    Zur Anzeige der Temperatur soll ein Smartphone dienen. Eine darauf laufende
+    App soll die Temperatur mit entsprechender Einheit gut lesbar anzeigen und
+    diese Anzeige regelmäßig aktualisieren. Zum jetztigen Zeitpunkt befindet
+    sich diese App noch nicht in der Entwicklung, weshalb zu Testzwecken die App
+    \enquote{Bluetooth Terminal} \cite{bluetoothTerminal} verwendet wird.
+
+\bibliographystyle{IEEEtran}
+\bibliography{doku}
 
 \end{document}
