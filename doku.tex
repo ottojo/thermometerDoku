@@ -69,9 +69,14 @@ Arduino UNO Board integriert ist, gemessen.
     (-3, .5) to (-3, 1) to[R=1<\kohm>] (-3,3) node[vcc] {5V}
     %Output
     (opv1.out) node[right] {$V_{adc}$}
+    (opv1.out) --++(1,0) node[right] {$V_{adc}$}
     %Power
     (opv1.up) --++(0,0.5) node[vcc]{\SI{5}{\volt}}
     (opv1.down) --++(0,-0.5) node[ground]{}
+    %Feedback R
+    (opv1.-) to[short,*-] (-1.2,2.5)
+    (1.5,2.5) to[short,-*] (1.5,0)
+    (-1.2,2.5) [R=4.7<\kohm>] to(1.5,2.5)
     ;
   \end{circuitikz}
 \end{center}
